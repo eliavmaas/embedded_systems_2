@@ -15,10 +15,14 @@
 # Use: make [TARGET] [PLATFORM-OVERRIDES]
 #
 # Build Targets:
-#      <Put a description of the supported targets here>
-#
+#      <FILE>.o - Builds <FILE>.o object file
+#      build - Builds and links all source files
+#      all - Same as build
+#      clean - removes all generated files#
 # Platform Overrides:
-#      <Put a description of the supported Overrides here
+#      CPU - ARM Cortex Architecture (cortex-m0plus, cortex-m4)
+#      ARCH - ARM Architecture (arm, thumb)
+#      SPECS - Specs file to give the linker (nosys.specs, nano.specs)
 #
 #------------------------------------------------------------------------------
 include sources.mk
@@ -27,15 +31,37 @@ include sources.mk
 PLATFORM = 
 
 # Architectures Specific Flags
-LINKER_FILE = 
+LINKER_FILE = msp432p401r.lds
 CPU = 
-ARCH = 
+ifeq ($(PLATFORM),HOST)
+	CC = gcc
+else
+	CC = arm-none-eabi-gcc
+endif
+ARCH := $(shell arch)
 SPECS = 
 
 # Compiler Flags and Defines
-CC = 
-LD = 
-LDFLAGS = 
-CFLAGS = 
+# CC = arm-none-eabi-gcc
+LD = arm-none-eabi-ld
+LDFLAGS = -Wl,-Map=$(TARGET).map -T $(LINKER_FILE)
+CFLAGS = -mcpu=$(CPU) -m$(ARCH) --specs=$(SPECS) -Wall
 CPPFLAGs = 
 
+OBJS = $(SRCS:.c=.o)
+
+%.o : %.c
+	$(CC) -c $< $(CFLAGS) -o $@
+
+.PHONY: build
+build: all
+
+.PHONY: all
+all: $(TARGET).out
+
+$(TARGET).out: $(OBJS)
+	$(CC) $(OBJS) $(CFLAGS) $(LDFLAGS) -o $@
+
+.PHONY: clean
+clean:
+	rm -f $(OBJS) $(TARGET).out $(TARGET).map

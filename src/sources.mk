@@ -10,8 +10,11 @@
 #*****************************************************************************
 
 # Add your Source files to this variable
-SOURCES =
+SOURCES = main.c \
+		memory.c \
+		system src/startup_msp432p401r_gcc.c\
+		system_msp432p401r.c
 
 # Add your include paths to this variable
-INCLUDES = 
+INCLUDES = -l
 
