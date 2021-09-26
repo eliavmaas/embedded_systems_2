@@ -8,9 +8,11 @@
 # misuse of this material. 
 #
 #*****************************************************************************
-
+#
 #------------------------------------------------------------------------------
-# <Put a Description Here>
+# Makefile for Embedded System Coursera Course - Assignment 2. By specifying platform
+# (Host or MSP432) different compilers and flags are used. There is also the ability 
+# to make specific output files described in the build targets below.
 #
 # Use: make [TARGET] [PLATFORM-OVERRIDES]
 #
@@ -24,9 +26,8 @@
 #      all - Same as build
 #      clean - removes all generated files#
 # Platform Overrides:
-#      CPU - ARM Cortex Architecture (cortex-m4, host)
-#      ARCH - ARM Architecture (arm, thumb)
-#      SPECS - Specs file to give the linker (nosys.specs)
+#      CPU - cortex-m4 or host
+#      ARCH - armv7e-m or host
 #
 #------------------------------------------------------------------------------
 include sources.mk
@@ -78,7 +79,6 @@ ASM = $(SOURCES:.c=.asm) $(TARGET.out=.asm)
 
 .PHONY: compile-all
 compile-all: $(OBJS) $(DEPS)
-
 
 .PHONY: build
 build: all
