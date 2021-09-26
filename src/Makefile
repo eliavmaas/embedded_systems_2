@@ -63,7 +63,7 @@ CPPFLAGs = -Wall -Werror -g -O0 -std=c99
 OBJS = $(SOURCES:.c=.o)
 
 %.o : %.c
-	$(CC) -I$(INCLUDES) -c $< $(CFLAGS) $(CPPFLAGs) -o $@
+	$(CC) -I $(includes) -c $< $(CFLAGS) $(CPPFLAGs) -o $@
 
 # %.i : %.c
 # 	$(CC) -c $< $(CFLAGS) $(CPPFLAGs) -o $@

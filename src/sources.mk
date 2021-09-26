@@ -24,5 +24,12 @@ endif
 
 
 # Add your include paths to this variable
-INCLUDES = /../
+ifeq ($(PLATFORM),MSP432)
+includes = ../include/common \
+			../include/msp
+else
+includes = ../include/common \
+			../include/CMSIS
+endif
+
 
