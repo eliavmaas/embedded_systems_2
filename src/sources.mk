@@ -26,7 +26,7 @@ endif
 # Add your include paths to this variable
 ifeq ($(PLATFORM),MSP432)
 includes = ../include/common \
-			../include/msp
+			../include/msp432
 else
 includes = ../include/common \
 			../include/CMSIS

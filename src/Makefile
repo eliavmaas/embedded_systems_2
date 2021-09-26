@@ -16,32 +16,31 @@
 #
 # Build Targets:
 #      <FILE>.o - Builds <FILE>.o object file
+#	   <FILE>.d - Builds <FILE>.d dependency file
+#	   <FILE>.i - Builds <FILE>.i implementation file
+#	   <FILE>.asm, - Builds <FILE>.asm assembly file
+#	   compile-all - Builds all source files but does not link
 #      build - Builds and links all source files
 #      all - Same as build
 #      clean - removes all generated files#
 # Platform Overrides:
-#      CPU - ARM Cortex Architecture (cortex-m0plus, cortex-m4)
+#      CPU - ARM Cortex Architecture (cortex-m4, host)
 #      ARCH - ARM Architecture (arm, thumb)
-#      SPECS - Specs file to give the linker (nosys.specs, nano.specs)
+#      SPECS - Specs file to give the linker (nosys.specs)
 #
 #------------------------------------------------------------------------------
 include sources.mk
 
 TARGET = c1m2
 
-# Platform Overrides
-
-# Architectures Specific Flags
-
-# -T msp432p401r.lds
 ifeq ($(PLATFORM),MSP432)
 	CC = arm-none-eabi-gcc
 	CPU = cortex-m4
 	ARCH = armv7e-m
 	LINKER_FILE = msp432p401r.lds
-	CFLAGS = -mcpu=$(CPU) -m$(ARCH) --specs=$(SPECS) \
+	CFLAGS = -mcpu=$(CPU) -march=$(ARCH) \
 			-mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 \
-			-specs=nosys.specs -DMSP432
+			--specs=nosys.specs -DMSP432
 	LDFLAGS = -Wl,-Map=$(TARGET).map -T $(LINKER_FILE)
 else
 	CC = gcc
@@ -52,21 +51,34 @@ else
 endif
 
 
-
-# Compiler Flags and Defines
-
 LD = arm-none-eabi-ld
-# LDFLAGS = -Wl,-Map=$(TARGET).map -T $(LINKER_FILE)
-# CFLAGS = -mcpu=$(CPU) -m$(ARCH) --specs=$(SPECS) -Wall
+
 CPPFLAGs = -Wall -Werror -g -O0 -std=c99
 
 OBJS = $(SOURCES:.c=.o)
+DEPS = $(SOURCES:.c=.d)
+IMP = $(SOURCES:.c=.i)
+ASM = $(SOURCES:.c=.asm) $(TARGET.out=.asm)
 
 %.o : %.c
 	$(CC) -I $(includes) -c $< $(CFLAGS) $(CPPFLAGs) -o $@
 
-# %.i : %.c
-# 	$(CC) -c $< $(CFLAGS) $(CPPFLAGs) -o $@
+%.d : %.c
+	$(CC) -I $(includes) -M $< $(CFLAGS) $(CPPFLAGs) -o $@
+
+%.i : %.c
+	$(CC) -I $(includes) -E $< $(CFLAGS) $(CPPFLAGs) -o $@
+
+%.asm : %.c
+	$(CC) -I $(includes) -S $< $(CFLAGS) $(CPPFLAGs) -o $@
+
+%.asm : %.out
+	objdump -d $< > $@
+
+
+.PHONY: compile-all
+compile-all: $(OBJS) $(DEPS)
+
 
 .PHONY: build
 build: all
@@ -74,9 +86,10 @@ build: all
 .PHONY: all
 all: $(TARGET).out
 
-$(TARGET).out: $(OBJS)
+$(TARGET).out: $(OBJS) $(DEPS) $(IMP)
 	$(CC) $(OBJS) $(CFLAGS) $(CPPFLAGs) $(LDFLAGS) -o $@
 
 .PHONY: clean
 clean:
-	rm -f $(OBJS) $(TARGET).out $(TARGET).map
+# 	  rm -f $(OBJS) $(DEPS) $(ASM) $(IMP) $(TARGET).out $(TARGET).map
+	rm -f *.o *.i *.d *.out *.map *.asm
