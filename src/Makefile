@@ -88,6 +88,7 @@ all: $(TARGET).out
 
 $(TARGET).out: $(OBJS) $(DEPS) $(IMP)
 	$(CC) $(OBJS) $(CFLAGS) $(CPPFLAGs) $(LDFLAGS) -o $@
+	size $@
 
 .PHONY: clean
 clean:
