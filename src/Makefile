@@ -38,7 +38,7 @@ ifeq ($(PLATFORM),MSP432)
 	CC = arm-none-eabi-gcc
 	CPU = cortex-m4
 	ARCH = armv7e-m
-	LINKER_FILE = msp432p401r.lds
+	LINKER_FILE = ../msp432p401r.lds
 	CFLAGS = -mcpu=$(CPU) -march=$(ARCH) \
 			-mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 \
 			--specs=nosys.specs -DMSP432
@@ -62,16 +62,16 @@ IMP = $(SOURCES:.c=.i)
 ASM = $(SOURCES:.c=.asm) $(TARGET.out=.asm)
 
 %.o : %.c
-	$(CC) -I $(includes) -c $< $(CFLAGS) $(CPPFLAGs) -o $@
+	$(CC) $(includes) -c $< $(CFLAGS) $(CPPFLAGs) -o $@
 
 %.d : %.c
-	$(CC) -I $(includes) -M $< $(CFLAGS) $(CPPFLAGs) -o $@
+	$(CC) $(includes) -M $< $(CFLAGS) $(CPPFLAGs) -o $@
 
 %.i : %.c
-	$(CC) -I $(includes) -E $< $(CFLAGS) $(CPPFLAGs) -o $@
+	$(CC) $(includes) -E $< $(CFLAGS) $(CPPFLAGs) -o $@
 
 %.asm : %.c
-	$(CC) -I $(includes) -S $< $(CFLAGS) $(CPPFLAGs) -o $@
+	$(CC) $(includes) -S $< $(CFLAGS) $(CPPFLAGs) -o $@
 
 %.asm : %.out
 	objdump -d $< > $@
